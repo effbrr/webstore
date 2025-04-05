@@ -28,6 +28,10 @@ const openRegisterModal = () => {
   showLoginModal.value = false;
 };
 
+const handleSuccess = () => {
+  closeModals();
+};
+
 const closeModals = () => {
   showLoginModal.value = false;
   showRegisterModal.value = false;
@@ -42,32 +46,33 @@ const logout = () => {
   <header class="header">
     <nav class="nav">
       <div class="container">
-        <div class="burger" @click="toggleMenu">
-          <span :class="{ 'burger-line': true, 'open': isMenuOpen }"></span>
-          <span :class="{ 'burger-line': true, 'open': isMenuOpen }"></span>
-          <span :class="{ 'burger-line': true, 'open': isMenuOpen }"></span>
-        </div>
         <ul :class="{ 'menu': true, 'open': isMenuOpen }">
           <li><router-link to="/" @click="closeMenu">Home</router-link></li>
           <li><router-link to="/about" @click="closeMenu">About</router-link></li>
           <li><router-link to="/contact" @click="closeMenu">Contact</router-link></li>
         </ul>
-        <div v-if="!authStore.isAuthenticated">
-          <button class="login-btn" @click="openLoginModal">Login</button>
-        </div>
-        <div v-else>
-          <router-link to="/dashboard">
-            <button class="user-btn">User Icon</button>
-          </router-link>
-          <button class="logout-btn" @click="logout">Logout</button>
+        <div class="user">
+          <div v-if="!authStore.isAuthenticated">
+            <button class="login-btn" @click="openLoginModal">Login</button>
+          </div>
+          <div v-else>
+            <router-link to="/dashboard">
+              <button class="user-btn">User Icon</button>
+            </router-link>
+            <button class="logout-btn" @click="logout">Logout</button>
+          </div>
         </div>
         <Modal v-model="showLoginModal">
-          <Login />
-          <p>Don't have an account? <button class="register-link" @click="openRegisterModal">Register</button></p>
+          <Login @success="handleSuccess" @register="openRegisterModal" />
         </Modal>
         <Modal v-model="showRegisterModal">
-          <Register />
+          <Register @success="handleSuccess" />
         </Modal>
+        <div class="burger" @click="toggleMenu">
+          <span :class="{ 'burger-line': true, 'open': isMenuOpen }"></span>
+          <span :class="{ 'burger-line': true, 'open': isMenuOpen }"></span>
+          <span :class="{ 'burger-line': true, 'open': isMenuOpen }"></span>
+        </div>
       </div>
     </nav>
   </header>
@@ -88,6 +93,12 @@ const logout = () => {
   position: relative;
   width: 100%;
 }
+
+.container {
+  flex-direction: row;
+  justify-content: space-between;
+}
+
 .burger {
   display: none;
   flex-direction: column;
@@ -114,6 +125,7 @@ const logout = () => {
   transform: translateY(-7px) rotate(-45deg);
 }
 .menu {
+  margin: auto 0;
   list-style: none;
   display: flex;
   gap: 2rem;
@@ -130,14 +142,15 @@ const logout = () => {
   color: #b3e5fc; /* Lighter blue color for hover effect */
 }
 .login-btn {
-  background: none;
-  border: none;
+  background-color: #03a9f4;
   color: white;
-  font-size: 1rem;
-  cursor: pointer;
+  border: 2px solid white;
+  padding: 0.5rem 1rem;
 }
+
 .login-btn:hover {
-  color: #b3e5fc; /* Lighter blue color for hover effect */
+  background-color: #0288d1;
+  color: white;
 }
 .register-link {
   background: none;
@@ -152,6 +165,13 @@ const logout = () => {
 }
 /* Media queries for responsiveness */
 @media (max-width: 768px) {
+  .container {
+    justify-content: flex-end;
+  }
+
+  .user {
+    margin: auto 1rem auto auto;
+  }
   .burger {
     display: flex;
   }
