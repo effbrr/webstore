@@ -1,0 +1,282 @@
+openapi: 3.0.0
+info:
+  version: "1"
+  title: Webstore API
+  description: Backend for the Webstore application
+  contact:
+    name: Fredrik B
+
+servers:
+  - url: /api
+
+security:
+  - bearerAuth: []
+
+paths:
+  /order:
+    get:
+      summary: Fetches a list of all orders
+      tags:
+        - order
+      operationId: getOrders
+      responses:
+        '200':
+          description: A list of orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderDto'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        default:
+          $ref: '#/components/responses/DefaultError'
+    post:
+      summary: Creates a new order OR shopping basket
+      operationId: createOrder
+      tags:
+        - order
+      requestBody:
+        description: The new order or shopping basket to be created.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewOrderDto'
+      responses:
+        '201':
+          description: Order or shopping basket was created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDto'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        default:
+          $ref: '#/components/responses/DefaultError'
+  /order/{customerId}:
+    get:
+      summary: Fetches a list of orders for logged in customer
+      tags:
+        - order
+      operationId: getCustomerOrders
+      parameters:
+        - in: path
+          name: customerId
+          schema:
+            type: integer
+          required: true
+          description: Id for customer
+      responses:
+        '200':
+          description: A list of customer orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderDto'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        default:
+          $ref: '#/components/responses/DefaultError'
+
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    BaseOrderDto:
+      type: object
+      required:
+        - customerId
+        - totalPrice
+        - orderStatus
+      properties:
+        customerId:
+          type: integer
+          description: ID of customer
+        totalPrice:
+          type: string
+        orderStatus:
+          $ref: '#/components/schemas/OrderStatus'
+
+    NewOrderDto:
+      allOf:
+        - $ref: '#/components/schemas/BaseOrderDto'
+      type: object
+      required:
+        - orderLines
+      properties:
+        orderLines:
+          type: array
+          items:
+            $ref: '#/components/schemas/NewOrderLineDto'
+
+    OrderDto:
+      allOf:
+        - $ref: '#/components/schemas/BaseOrderDto'
+      type: object
+      required:
+        - id
+        - lastModified
+        - paymentStatus
+        - orderLines
+      properties:
+        id:
+          type: integer
+          description: Order ID
+        customerId:
+          type: integer
+        totalPrice:
+          type: string
+        lastModified:
+          type: string
+          format: date-time
+          readOnly: true
+        finalizedOrderDateTIme:
+          type: string
+          format: date-time
+          readOnly: true
+        paymentStatus:
+          $ref: '#/components/schemas/PaymentStatus'
+        orderLines:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderLineDto'
+
+    BaseOrderLineDto:
+      type: object
+      required:
+        - itemId
+        - quantity
+        - unitPrice
+      properties:
+        itemId:
+          type: integer
+        quantity:
+          type: integer
+        unitPrice:
+          type: string
+
+    NewOrderLineDto:
+      allOf:
+        - $ref: '#/components/schemas/BaseOrderLineDto'
+
+    OrderLineDto:
+      allOf:
+        - $ref: '#/components/schemas/BaseOrderLineDto'
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+        itemTitle:
+          type: string
+
+
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+
+
+    OrderStatus:
+      type: string
+      enum:
+        - SHOPPING_CART
+        - PROCESSING
+        - IN_PROGRESS
+        - SHIPPED
+        - DELIVERED
+        - RETURNED
+      description: >
+        Type status:
+          * `SHOPPING_CARD` - Status for at objektet er opprettet og klart for godkjenning
+          * `PROCESSING` - Status for at objektet er avvist
+          * `IN_PROGRESS` - Status for at objektet redigeres
+          * `SHIPPED` - Status for at objektet er godkjent
+          * `DELIVERED` - Status for at objektet er bestilt
+          * `RETURN` - Status for at objektet er bestilt
+      readOnly: true
+
+    PaymentStatus:
+      type: string
+      enum:
+        - PAID
+        - UNPAID
+        - PAID_INVOICE
+        - UNPAID_INVOICE
+        - UNPAID_ERROR
+      description: >
+        Type status:
+          * `PAID` - Status for at objektet er opprettet og klart for godkjenning
+          * `UNPAID` - Status for at objektet er avvist
+          * `PAID_INVOICE` - Status for at objektet redigeres
+          * `UNPAID_INVOICE` - Status for at objektet er godkjent
+          * `UNPAID_ERROR` - Status for at objektet er bestilt
+      readOnly: true
+
+  responses:
+    BadRequest:
+      description: An error occurred during request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: You lack the requited permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: You can't access the specific resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Can't find specified resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalServerError:
+      description: An error occurred on the server
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    DefaultError:
+      description: An error occured
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
