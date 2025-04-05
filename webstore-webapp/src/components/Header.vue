@@ -1,7 +1,15 @@
 <script setup>
 import { ref } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+import Modal from './Modal.vue';
+import Login from './Login.vue';
+import Register from './Register.vue';
 
 const isMenuOpen = ref(false);
+const showLoginModal = ref(false);
+const showRegisterModal = ref(false);
+
+const authStore = useAuthStore();
 
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
@@ -9,6 +17,23 @@ const toggleMenu = () => {
 
 const closeMenu = () => {
   isMenuOpen.value = false;
+};
+
+const openLoginModal = () => {
+  showLoginModal.value = true;
+};
+
+const openRegisterModal = () => {
+  showRegisterModal.value = true;
+};
+
+const closeModals = () => {
+  showLoginModal.value = false;
+  showRegisterModal.value = false;
+};
+
+const logout = () => {
+  authStore.logout();
 };
 </script>
 
@@ -26,9 +51,23 @@ const closeMenu = () => {
           <li><router-link to="/about" @click="closeMenu">About</router-link></li>
           <li><router-link to="/contact" @click="closeMenu">Contact</router-link></li>
         </ul>
-        <button class="close-btn" @click="closeMenu" v-if="isMenuOpen">&times;</button>
+        <div v-if="!authStore.isAuthenticated">
+          <button class="login-btn" @click="openLoginModal">Login</button>
+          <button class="register-btn" @click="openRegisterModal">Register</button>
+        </div>
+        <div v-else>
+          <router-link to="/dashboard">
+            <button class="user-btn">User Icon</button>
+          </router-link>
+          <button class="logout-btn" @click="logout">Logout</button>
+        </div>
+        <Modal v-if="showLoginModal" @close="closeModals">
+          <Login />
+        </Modal>
+        <Modal v-if="showRegisterModal" @close="closeModals">
+          <Register />
+        </Modal>
       </div>
-
     </nav>
   </header>
 </template>
@@ -36,7 +75,6 @@ const closeMenu = () => {
 <style scoped>
 .header {
   background-color: #03a9f4; /* Light blue color */
-
   height: 60px; /* Fixed height for the header */
   box-sizing: border-box; /* Ensure padding does not affect the width and height */
   display: flex;
@@ -49,18 +87,15 @@ const closeMenu = () => {
   position: relative;
   width: 100%;
 }
-
 .burger {
   display: none;
   flex-direction: column;
   cursor: pointer;
   align-items: flex-end;
 }
-
 .burger:hover .burger-line {
   background-color: #b3e5fc; /* Lighter blue color for hover effect */
 }
-
 .burger-line {
   width: 25px;
   height: 3px;
@@ -68,62 +103,46 @@ const closeMenu = () => {
   margin: 4px 0;
   transition: transform 0.4s, opacity 0.4s, background-color 0.2s;
 }
-
 .burger-line.open:nth-child(1) {
   transform: translateY(7px) rotate(45deg);
 }
-
 .burger-line.open:nth-child(2) {
   opacity: 0;
 }
-
 .burger-line.open:nth-child(3) {
   transform: translateY(-7px) rotate(-45deg);
 }
-
 .menu {
   list-style: none;
   display: flex;
   gap: 2rem;
 }
-
 .menu li {
   margin: 0;
 }
-
 .menu a {
   color: white;
   text-decoration: none;
   font-weight: bold;
 }
-
 .menu a:hover {
   color: #b3e5fc; /* Lighter blue color for hover effect */
 }
-
-.close-btn {
-  display: none;
-  font-size: 3.2rem;
-  color: white;
+.login-btn {
   background: none;
   border: none;
+  color: white;
+  font-size: 1rem;
   cursor: pointer;
-  position: fixed;
-  top: .2rem;
-  right: .8rem;
-  z-index: 1001; /* Ensure it is above the menu */
 }
-
-.close-btn:hover {
+.login-btn:hover {
   color: #b3e5fc; /* Lighter blue color for hover effect */
 }
-
 /* Media queries for responsiveness */
 @media (max-width: 768px) {
   .burger {
     display: flex;
   }
-
   .menu {
     display: none;
     flex-direction: column;
@@ -139,13 +158,11 @@ const closeMenu = () => {
     align-items: center;
     z-index: 1000;
   }
-
   .menu.open {
     display: flex;
   }
-
-  .close-btn {
-    display: block;
+  .login-btn {
+    display: none;
   }
 }
 </style>
