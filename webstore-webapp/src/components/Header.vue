@@ -25,6 +25,7 @@ const openLoginModal = () => {
 
 const openRegisterModal = () => {
   showRegisterModal.value = true;
+  showLoginModal.value = false;
 };
 
 const closeModals = () => {
@@ -53,7 +54,6 @@ const logout = () => {
         </ul>
         <div v-if="!authStore.isAuthenticated">
           <button class="login-btn" @click="openLoginModal">Login</button>
-          <button class="register-btn" @click="openRegisterModal">Register</button>
         </div>
         <div v-else>
           <router-link to="/dashboard">
@@ -61,10 +61,11 @@ const logout = () => {
           </router-link>
           <button class="logout-btn" @click="logout">Logout</button>
         </div>
-        <Modal v-if="showLoginModal" @close="closeModals">
+        <Modal v-model="showLoginModal">
           <Login />
+          <p>Don't have an account? <button class="register-link" @click="openRegisterModal">Register</button></p>
         </Modal>
-        <Modal v-if="showRegisterModal" @close="closeModals">
+        <Modal v-model="showRegisterModal">
           <Register />
         </Modal>
       </div>
@@ -137,6 +138,17 @@ const logout = () => {
 }
 .login-btn:hover {
   color: #b3e5fc; /* Lighter blue color for hover effect */
+}
+.register-link {
+  background: none;
+  border: none;
+  color: #03a9f4;
+  font-size: 1rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.register-link:hover {
+  color: #0288d1; /* Darker blue color for hover effect */
 }
 /* Media queries for responsiveness */
 @media (max-width: 768px) {

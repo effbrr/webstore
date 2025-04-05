@@ -1,14 +1,20 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, defineProps, defineEmits, watch } from 'vue';
 
-const showModal = ref(false);
+const props = defineProps({
+  modelValue: Boolean,
+});
 
-const openModal = () => {
-  showModal.value = true;
-};
+const emit = defineEmits(['update:modelValue']);
+
+watch(() => props.modelValue, (newValue) => {
+  showModal.value = newValue;
+});
+
+const showModal = ref(props.modelValue);
 
 const closeModal = () => {
-  showModal.value = false;
+  emit('update:modelValue', false);
 };
 </script>
 
