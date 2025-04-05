@@ -1,0 +1,70 @@
+/* Basic reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px; /* This sets the base font size */
+}
+
+/* Reset default margin and padding */
+body {
+  margin: 0;
+  padding: 0;
+  font-size: 1rem; /* 16px */
+  font-family: 'Helvetica Neue', Arial, sans-serif; /* Use a sans-serif font */
+}
+
+h1 {
+  font-size: 2rem; /* 32px */
+}
+
+p {
+  font-size: 1rem; /* 16px */
+  margin-bottom: 1rem; /* 16px */
+}
+
+/* Container class */
+.container {
+  margin: 0 auto;
+  padding: 1rem;
+  width: 100%;
+  max-width: 1340px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Default breakpoints for responsiveness */
+@media (min-width: 576px) {
+  .container {
+    padding: 1rem 30px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+
+  }
+}
+
+@media (min-width: 992px) {
+  .container {
+
+  }
+}
+
+@media (min-width: 1200px) {
+  .container {
+
+  }
+}
+
+@media (min-width: 1400px) {
+  .container {
+
+  }
+}
