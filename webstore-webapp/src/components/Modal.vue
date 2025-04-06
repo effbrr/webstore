@@ -54,7 +54,8 @@ const closeModal = () => {
   right: 10px;
   background: none;
   border: none;
-  font-size: 1.5rem;
+  color: black;
+  font-size: 2rem;
   cursor: pointer;
 }
 </style>

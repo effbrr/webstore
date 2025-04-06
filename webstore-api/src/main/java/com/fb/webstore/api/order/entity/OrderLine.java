@@ -1,6 +1,6 @@
 package com.fb.webstore.api.order.entity;
 
-import com.fb.webstore.api.item.Item;
+import com.fb.webstore.api.item.entity.Item;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

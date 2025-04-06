@@ -2,7 +2,6 @@ package com.fb.webstore.api.order.service;
 
 import com.fb.openapi.model.OrderLineDto;
 import com.fb.webstore.api.item.service.ItemService;
-import com.fb.webstore.api.order.entity.OrderLine;
 import com.fb.webstore.api.order.mapper.OrderLineMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,9 +16,9 @@ public class OrderLineService {
     private final ItemService itemService;
     private final OrderLineMapper orderLineMapper;
 
-    public List<OrderLine> mapDtoToEntityList(List<OrderLineDto> orderLineDtoList) {
-        return orderLineDtoList.stream().map(o -> orderLineMapper.dtoToEntity(o, itemService.getItem(o.getItemId()))).collect(Collectors.toList());
-    }
+//    public List<OrderLine> mapDtoToEntityList(List<OrderLineDto> orderLineDtoList) {
+//        return orderLineDtoList.stream().map(o -> orderLineMapper.dtoToEntity(o, itemService.getItemById(o.getItemId()))).collect(Collectors.toList());
+//    }
 }
 
 

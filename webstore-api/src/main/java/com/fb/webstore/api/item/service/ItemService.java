@@ -1,69 +1,153 @@
 package com.fb.webstore.api.item.service;
 
-import com.fb.webstore.api.item.Item;
-import com.fb.webstore.api.item.ItemCategory;
-import com.fb.webstore.api.item.ItemPrice;
-import com.fb.webstore.api.item.repo.ItemPriceRepo;
+import com.fb.openapi.model.*;
+import com.fb.webstore.api.item.entity.Item;
+import com.fb.webstore.api.item.entity.ItemCategory;
+import com.fb.webstore.api.item.entity.ItemImage;
+import com.fb.webstore.api.item.entity.ItemPrice;
+import com.fb.webstore.api.item.repo.ItemCategoryRepository;
 import com.fb.webstore.api.item.repo.ItemRepository;
-import jakarta.annotation.PostConstruct;
-import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-@Component
-@RequiredArgsConstructor
+@Service
 public class ItemService {
 
-    private final ItemRepository itemRepository;
-    private final ItemPriceRepo itemPriceRepo;
-    private final EntityManager em;
+    @Autowired
+    private ItemRepository itemRepository;
 
-    public void saveItem(final Item item) {
-        itemRepository.save(item);
+    @Autowired
+    private ItemCategoryRepository itemCategoryRepository;
+
+    public List<LimitedItemDto> getAllItems() {
+        return itemRepository.findAll().stream().map(this::toLimitedItemDto).collect(Collectors.toList());
     }
 
-    public Item getItem(final Integer id) {
-        return itemRepository.findById(id).orElseThrow();
+    public Optional<ItemDto> getItemById(Integer id) {
+        return itemRepository.findById(id).map(this::toItemDto);
     }
 
-    @PostConstruct
     @Transactional
-    public void setUpItems() {
-        final ItemCategory protein = em.find(ItemCategory.class, 1);
-        final ItemCategory food = em.find(ItemCategory.class, 2);
-        final ItemCategory drinks = em.find(ItemCategory.class, 3);
-        final ItemPrice itemPrice1 = new ItemPrice(new BigDecimal("99.99"));
-        final ItemPrice itemPrice2 = new ItemPrice(new BigDecimal("49.99"));
-        final ItemPrice itemPrice3 = new ItemPrice(new BigDecimal("29.99"));
-        final Item item1 = Item.builder()
-            .title("Protein Powder")
-            .description("Markedets beste proteinpulver")
-            .category(protein)
-            .price(itemPrice1)
-            .supply(999)
-            .build();
-
-        final Item item2 = Item.builder()
-            .title("Energy Bar")
-            .description("Markedets beste energibar")
-            .category(food)
-            .price(itemPrice2)
-            .supply(999)
-            .build();
-
-        final Item item3 = Item.builder()
-            .title("Monster Energy Ultra Fiesta")
-            .description("Markedets beste proteinpulver")
-            .category(drinks)
-            .price(itemPrice3)
-            .supply(999)
-            .build();
-        saveItem(item1);
-        saveItem(item2);
-        saveItem(item3);
+    public ItemDto createItem(CreateItemDto createItemDto) {
+        Item item = toItem(createItemDto);
+        item.getImages().forEach(image -> image.setItem(item));
+        return toItemDto(itemRepository.save(item));
     }
 
+    @Transactional
+    public Optional<ItemDto> updateItem(Integer id, ItemDto itemDto) {
+        return itemRepository.findById(id).map(item -> {
+            item.setTitle(itemDto.getTitle());
+            item.setShortDescription(itemDto.getShortDescription());
+            item.setDescription(itemDto.getDescription());
+            item.setSupply(itemDto.getSupply());
+            item.setPrice(toItemPrice(itemDto.getPrice()));
+
+            itemCategoryRepository.findById(itemDto.getCategoryId()).ifPresent(item::setCategory);
+
+            item.getImages().clear();
+            item.getImages().addAll(itemDto.getImages().stream().map(this::toItemImage).toList());
+            item.getImages().forEach(image -> image.setItem(item));
+            return toItemDto(itemRepository.save(item));
+        });
+    }
+
+    private LimitedItemDto toLimitedItemDto(Item item) {
+        LimitedItemDto limitedItemDto = new LimitedItemDto();
+        limitedItemDto.setId(item.getId());
+        limitedItemDto.setCategoryId(item.getCategory().getId());
+        limitedItemDto.setShortDescription(item.getShortDescription());
+        limitedItemDto.setPrice(toCreateItemPriceDto(item.getPrice()));
+        limitedItemDto.setImageUrl(item.getImages().isEmpty() ? null : item.getImages().get(0).getPath());
+        return limitedItemDto;
+    }
+
+    private ItemDto toItemDto(Item item) {
+        ItemDto itemDto = new ItemDto();
+        itemDto.setId(item.getId());
+        itemDto.setTitle(item.getTitle());
+        itemDto.setShortDescription(item.getShortDescription());
+        itemDto.setDescription(item.getDescription());
+        itemDto.setSupply(item.getSupply());
+        itemDto.setPrice(toItemPriceDto(item.getPrice()));
+        itemDto.setCategoryId(item.getCategory().getId());
+        itemDto.setImages(item.getImages().stream().map(this::toItemImageDto).collect(Collectors.toList()));
+        return itemDto;
+    }
+
+    private Item toItem(CreateItemDto createItemDto) {
+        ItemCategory category = itemCategoryRepository.findById(createItemDto.getCategoryId()).orElse(null);
+        Item item = new Item();
+        item.setTitle(createItemDto.getTitle());
+        item.setShortDescription(createItemDto.getShortDescription());
+        item.setDescription(createItemDto.getDescription());
+        item.setSupply(createItemDto.getSupply());
+        item.setPrice(toItemPrice(createItemDto.getPrice()));
+        item.setCategory(category);
+        item.setImages(createItemDto.getImages().stream().map(this::toItemImage).collect(Collectors.toList()));
+        return item;
+    }
+
+    private ItemPrice toItemPrice(CreateItemPriceDto createItemPriceDto) {
+        ItemPrice itemPrice = new ItemPrice();
+        itemPrice.setDefaultPrice(createItemPriceDto.getDefaultPrice());
+        itemPrice.setCurrentPrice(createItemPriceDto.getCurrentPrice());
+        itemPrice.setValidFrom(createItemPriceDto.getValidFrom());
+        itemPrice.setValidTo(createItemPriceDto.getValidTo());
+        return itemPrice;
+    }
+
+    private ItemPrice toItemPrice(ItemPriceDto itemPriceDto) {
+        ItemPrice itemPrice = new ItemPrice();
+        itemPrice.setId(itemPriceDto.getId());
+        itemPrice.setDefaultPrice(itemPriceDto.getDefaultPrice());
+        itemPrice.setCurrentPrice(itemPriceDto.getCurrentPrice());
+        itemPrice.setValidFrom(itemPriceDto.getValidFrom());
+        itemPrice.setValidTo(itemPriceDto.getValidTo());
+        return itemPrice;
+    }
+
+    private ItemImage toItemImage(CreateItemImageDto createItemImageDto) {
+        ItemImage itemImage = new ItemImage();
+        itemImage.setPath(createItemImageDto.getPath());
+        return itemImage;
+    }
+
+    private ItemImage toItemImage(ItemImageDto itemImageDto) {
+        ItemImage itemImage = new ItemImage();
+        itemImage.setId(itemImageDto.getId());
+        itemImage.setPath(itemImageDto.getPath());
+        return itemImage;
+    }
+
+    private CreateItemPriceDto toCreateItemPriceDto(ItemPrice itemPrice) {
+        CreateItemPriceDto createItemPriceDto = new CreateItemPriceDto();
+        createItemPriceDto.setDefaultPrice(itemPrice.getDefaultPrice());
+        createItemPriceDto.setCurrentPrice(itemPrice.getCurrentPrice());
+        createItemPriceDto.setValidFrom(itemPrice.getValidFrom());
+        createItemPriceDto.setValidTo(itemPrice.getValidTo());
+        return createItemPriceDto;
+    }
+
+    private ItemPriceDto toItemPriceDto(ItemPrice itemPrice) {
+        ItemPriceDto itemPriceDto = new ItemPriceDto();
+        itemPriceDto.setId(itemPrice.getId());
+        itemPriceDto.setDefaultPrice(itemPrice.getDefaultPrice());
+        itemPriceDto.setCurrentPrice(itemPrice.getCurrentPrice());
+        itemPriceDto.setValidFrom(itemPrice.getValidFrom());
+        itemPriceDto.setValidTo(itemPrice.getValidTo());
+        return itemPriceDto;
+    }
+
+    private ItemImageDto toItemImageDto(ItemImage itemImage) {
+        ItemImageDto itemImageDto = new ItemImageDto();
+        itemImageDto.setId(itemImage.getId());
+        itemImageDto.setPath(itemImage.getPath());
+        return itemImageDto;
+    }
 }

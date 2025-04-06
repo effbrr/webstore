@@ -5,6 +5,7 @@ import Modal from './Modal.vue';
 import Login from './Login.vue';
 import Register from './Register.vue';
 import HeaderMenu from './HeaderMenu.vue';
+import SearchBar from './SearchBar.vue';
 
 const isMenuOpen = ref(false);
 const showLoginModal = ref(false);
@@ -56,8 +57,8 @@ const logout = () => {
           <router-link to="/" class="logo-link">
             <img src="@/assets/webstore-logo.svg" alt="Webstore Logo" class="logo" />
           </router-link>
+          <SearchBar />
         </div>
-        <div class="center"></div>
         <div class="right flex">
           <div v-if="!authStore.isAuthenticated">
             <button class="login-btn" @click="openLoginModal">Login</button>
@@ -104,7 +105,7 @@ const logout = () => {
 
 .logo {
   height: 40px;
-  margin-left: 1rem;
+  margin-left: 1.5rem;
 }
 
 .logo-link {
@@ -144,6 +145,7 @@ const logout = () => {
 }
 button {
   border: 2px solid white;
+  height: 40px;
   padding: 0.5rem 1rem;
   margin-left: 0.5rem;
   transition: background-color 0.3s, color 0.3s, border-color 0.3s;

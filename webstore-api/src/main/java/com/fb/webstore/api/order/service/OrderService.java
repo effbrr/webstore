@@ -25,36 +25,36 @@ public class OrderService {
     private final OrderLineService orderLineService;
     private final OrderValidator orderValidator;
 
-    public OrderDto createCart(final OrderDto orderDto) {
-        final Order cart = mapOrderDtoToEntity(orderDto);
-        cart.setLastModified(OffsetDateTime.now());
+//    public OrderDto createCart(final OrderDto orderDto) {
+//        final Order cart = mapOrderDtoToEntity(orderDto);
+//        cart.setLastModified(OffsetDateTime.now());
+//
+//        orderValidator.validateNewCart(cart);
+//
+//
+//        final Order createdCart = orderRepository.save(cart);
+//        return orderMapper.orderEntityToDto(createdCart);
+//    }
+//
+//    public OrderDto createOrder(final OrderDto orderDto) {
+//
+//        final Order order = mapOrderDtoToEntity(orderDto);
+//        order.setLastModified(OffsetDateTime.now());
+//        order.setPaymentStatus(PaymentStatus.UNPAID);
+//
+//        orderValidator.validateNewOrder(order);
+//
+//        final Order createdOrder = orderRepository.save(order);
+//        return orderMapper.orderEntityToDto(createdOrder);
+//    }
+//
 
-        orderValidator.validateNewCart(cart);
-
-
-        final Order createdCart = orderRepository.save(cart);
-        return orderMapper.orderEntityToDto(createdCart);
-    }
-
-    public OrderDto createOrder(final OrderDto orderDto) {
-
-        final Order order = mapOrderDtoToEntity(orderDto);
-        order.setLastModified(OffsetDateTime.now());
-        order.setPaymentStatus(PaymentStatus.UNPAID);
-
-        orderValidator.validateNewOrder(order);
-
-        final Order createdOrder = orderRepository.save(order);
-        return orderMapper.orderEntityToDto(createdOrder);
-    }
-
-
-    private Order mapOrderDtoToEntity(final OrderDto orderDto) {
-        final Customer customer = customerService.getCustomerByUserId(orderDto.getCustomerId())
-                .orElseThrow(() -> new IllegalArgumentException("Customer not found for userId: " + orderDto.getCustomerId()));
-        final List<OrderLine> orderLines = orderLineService.mapDtoToEntityList(orderDto.getOrderLines());
-        return orderMapper.orderDtoToEntity(orderDto, orderLines, customer);
-    }
+//    private Order mapOrderDtoToEntity(final OrderDto orderDto) {
+//        final Customer customer = customerService.getCustomerByUserId(orderDto.getCustomerId())
+//                .orElseThrow(() -> new IllegalArgumentException("Customer not found for userId: " + orderDto.getCustomerId()));
+//        final List<OrderLine> orderLines = orderLineService.mapDtoToEntityList(orderDto.getOrderLines());
+//        return orderMapper.orderDtoToEntity(orderDto, orderLines, customer);
+//    }
 
 
 }

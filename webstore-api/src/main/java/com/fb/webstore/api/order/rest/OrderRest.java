@@ -15,11 +15,11 @@ public class OrderRest implements OrderApi {
 
     private final OrderService orderService;
 
-    @Override
-    public ResponseEntity<OrderDto> createOrder(final OrderDto orderDto) {
-        final OrderDto createdOrder = orderService.createOrder(orderDto);
-        return ResponseEntity.ok(createdOrder);
-    }
+//    @Override
+//    public ResponseEntity<OrderDto> createOrder(final OrderDto orderDto) {
+//        final OrderDto createdOrder = orderService.createOrder(orderDto);
+//        return ResponseEntity.ok(createdOrder);
+//    }
 
     @Override
     public ResponseEntity<List<OrderDto>> getCustomerOrders(Integer customerId) {

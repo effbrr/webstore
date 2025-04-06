@@ -9,10 +9,85 @@ info:
 servers:
   - url: /api
 
-security:
-  - bearerAuth: []
-
 paths:
+  /items:
+    get:
+      operationId: getAllItems
+      summary: Get all items
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LimitedItemDto'
+    post:
+      operationId: createItem
+      summary: Create a new item
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Item to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateItemDto'
+      responses:
+        '201':
+          description: Item created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemDto'
+  /items/{id}:
+    get:
+      operationId: getItemById
+      summary: Get item by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemDto'
+        '404':
+          description: Item not found
+    put:
+      operationId: updateItemById
+      summary: Update item by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Item details to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemDto'
+      responses:
+        '200':
+          description: Item updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemDto'
+        '404':
+          description: Item not found
   /cart:
     post:
       summary: Creates a new shopping cart
@@ -164,6 +239,104 @@ components:
       bearerFormat: JWT
 
   schemas:
+    CreateItemDto:
+      type: object
+      properties:
+        title:
+          type: string
+        shortDescription:
+          type: string
+        description:
+          type: string
+        supply:
+          type: integer
+        price:
+          $ref: '#/components/schemas/CreateItemPriceDto'
+        categoryId:
+          type: integer
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateItemImageDto'
+    CreateItemPriceDto:
+      type: object
+      properties:
+        defaultPrice:
+          type: number
+          format: BigDecimal
+        currentPrice:
+          type: number
+          format: BigDecimal
+        validFrom:
+          type: string
+          format: date
+        validTo:
+          type: string
+          format: date
+    ItemPriceDto:
+      type: object
+      properties:
+        id:
+          type: integer
+        defaultPrice:
+          type: number
+          format: BigDecimal
+        currentPrice:
+          type: number
+          format: BigDecimal
+        validFrom:
+          type: string
+          format: date
+        validTo:
+          type: string
+          format: date
+    CreateItemImageDto:
+      type: object
+      properties:
+        path:
+          type: string
+    ItemImageDto:
+      type: object
+      properties:
+        id:
+          type: integer
+        path:
+          type: string
+    LimitedItemDto:
+      type: object
+      properties:
+        id:
+          type: integer
+        categoryId:
+          type: integer
+        shortDescription:
+          type: string
+        price:
+          $ref: '#/components/schemas/CreateItemPriceDto'
+        imageUrl:
+          type: string
+    ItemDto:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        shortDescription:
+          type: string
+        description:
+          type: string
+        supply:
+          type: integer
+        price:
+          $ref: '#/components/schemas/ItemPriceDto'
+        categoryId:
+          type: integer
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemImageDto'
+
     OrderDto:
       type: object
       required:

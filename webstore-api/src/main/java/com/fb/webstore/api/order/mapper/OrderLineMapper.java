@@ -1,7 +1,7 @@
 package com.fb.webstore.api.order.mapper;
 
 import com.fb.openapi.model.OrderLineDto;
-import com.fb.webstore.api.item.Item;
+import com.fb.webstore.api.item.entity.Item;
 import com.fb.webstore.api.order.entity.OrderLine;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
