@@ -60,6 +60,7 @@ public class ItemService {
     private LimitedItemDto toLimitedItemDto(Item item) {
         LimitedItemDto limitedItemDto = new LimitedItemDto();
         limitedItemDto.setId(item.getId());
+        limitedItemDto.setTitle(item.getTitle());
         limitedItemDto.setCategoryId(item.getCategory().getId());
         limitedItemDto.setShortDescription(item.getShortDescription());
         limitedItemDto.setPrice(toCreateItemPriceDto(item.getPrice()));

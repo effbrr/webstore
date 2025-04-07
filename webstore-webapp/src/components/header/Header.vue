@@ -1,17 +1,26 @@
 <script setup>
 import { ref } from 'vue';
-import { useAuthStore } from '@/stores/auth';
-import Modal from './Modal.vue';
+import { useAuthStore } from '@/stores/auth.js';
+import { useCartStore } from '@/stores/cart';
+import { useRouter} from "vue-router";
+import Modal from '../Modal.vue';
 import Login from './Login.vue';
 import Register from './Register.vue';
-import HeaderMenu from './HeaderMenu.vue';
-import SearchBar from './SearchBar.vue';
+import HeaderMenu from './menu/HeaderMenu.vue';
+import SearchBar from './search/SearchBar.vue';
+import Cart from './cart/Cart.vue';
+import profileIcon from '@/assets/profile.svg';
+import cartIcon from '@/assets/cart.svg';
+import gymstoreLogo from '@/assets/gymstore-logo.svg';
 
 const isMenuOpen = ref(false);
 const showLoginModal = ref(false);
 const showRegisterModal = ref(false);
+const showCart = ref(false);
 
 const authStore = useAuthStore();
+const cartStore = useCartStore();
+const router = useRouter();
 
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
@@ -19,6 +28,10 @@ const toggleMenu = () => {
 
 const closeMenu = () => {
   isMenuOpen.value = false;
+};
+
+const openMenu = () => {
+  isMenuOpen.value = true;
 };
 
 const openLoginModal = () => {
@@ -42,33 +55,59 @@ const handleSuccess = () => {
 const logout = () => {
   authStore.logout();
 };
+
+const handleProfileClick = () => {
+  closeMenu();
+  if (!authStore.isAuthenticated) {
+    openLoginModal();
+  } else {
+    router.push("/dashboard");
+  }
+};
+
+const closeCart = () => {
+  showCart.value = false;
+}
+
+const toggleCart = () => {
+  closeMenu();
+  cartStore.toggleCart()
+};
+
+const onItemAddedToCart = () => {
+  showCart.value = true;
+};
 </script>
 
 <template>
-  <header class="header">
+  <header class="header" @mouseleave="closeMenu">
     <nav class="nav">
       <div class="container">
         <div class="left flex">
-          <div class="burger" @click="toggleMenu" @keydown.enter="toggleMenu" tabindex="0" aria-label="Toggle menu" role="button">
+          <div class="burger" @mouseover="openMenu" @click="toggleMenu" @keydown.enter="toggleMenu" tabindex="0" aria-label="Toggle menu" role="button">
             <span :class="{ 'burger-line': true, 'open': isMenuOpen }"></span>
             <span :class="{ 'burger-line': true, 'open': isMenuOpen }"></span>
             <span :class="{ 'burger-line': true, 'open': isMenuOpen }"></span>
           </div>
-          <router-link to="/" class="logo-link">
-            <img src="@/assets/webstore-logo.svg" alt="Webstore Logo" class="logo" />
+          <router-link to="/" class="logo-link" @click="closeMenu">
+            <img :src=gymstoreLogo alt="Webstore Logo" class="logo" />
           </router-link>
-          <SearchBar />
+          <SearchBar @click="closeMenu" />
         </div>
         <div class="right flex">
-          <div v-if="!authStore.isAuthenticated">
-            <button class="login-btn" @click="openLoginModal">Login</button>
-          </div>
-          <div v-else>
-            <router-link to="/dashboard">
-              <button class="user-btn">User Icon</button>
-            </router-link>
-            <button class="logout-btn" @click="logout">Logout</button>
-          </div>
+          <img
+              :src="profileIcon"
+              alt="Profile"
+              class="icon"
+              @click="handleProfileClick"
+
+          />
+          <img
+              :src="cartIcon"
+              alt="Cart"
+              class="icon"
+              @click="toggleCart"
+          />
         </div>
       </div>
     </nav>
@@ -76,19 +115,20 @@ const logout = () => {
     <Modal v-model="showLoginModal">
       <Login @success="handleSuccess" @register="openRegisterModal" />
     </Modal>
-    <Modal v-model="showRegisterModal">
+    <Modal v-model="showRegisterModal" @click="closeMenu">
       <Register @success="handleSuccess" />
     </Modal>
+    <Cart v-model="cartStore.isOpen" @click="closeMenu"/>
   </header>
 </template>
 
 <style scoped>
 .header {
-  background-color: #0d7bf2; /* Light blue color */
-  height: 80px; /* Fixed height for the header */
-  box-sizing: border-box; /* Ensure padding does not affect the width and height */
+  background-color: #1d1f21;
+  height: 80px;
+  box-sizing: border-box;
   display: flex;
-  align-items: center; /* Center content vertically */
+  align-items: center;
   position: relative;
 }
 .nav {
@@ -120,7 +160,7 @@ const logout = () => {
   width: 30px;
 }
 .burger:hover .burger-line {
-  background-color: #b3e5fc; /* Lighter blue color for hover effect */
+  transform: scale(1.1);
 }
 .burger-line {
   width: 30px;
@@ -134,6 +174,7 @@ const logout = () => {
   width: 37px;
   margin-left: -3px;
 }
+
 .burger-line.open:nth-child(1) {
   transform: translateY(12px) rotate(45deg);
 }
@@ -143,11 +184,22 @@ const logout = () => {
 .burger-line.open:nth-child(3) {
   transform: translateY(-12px) rotate(-45deg);
 }
-button {
-  border: 2px solid white;
+
+.icon {
+  width: 40px;
   height: 40px;
-  padding: 0.5rem 1rem;
-  margin-left: 0.5rem;
-  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+  margin-left: 1rem;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.icon:hover {
+  transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+  .logo {
+    content: url('@/assets/gymstore-logo-mobile.svg');
+  }
 }
 </style>

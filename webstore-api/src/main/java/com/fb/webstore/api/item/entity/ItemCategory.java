@@ -29,6 +29,8 @@ public class ItemCategory {
     @NotBlank
     private String description;
 
+    private String imageUrl;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 

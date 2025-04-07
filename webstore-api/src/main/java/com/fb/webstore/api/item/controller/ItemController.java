@@ -1,4 +1,4 @@
-package com.fb.webstore.api.item;
+package com.fb.webstore.api.item.controller;
 
 import com.fb.openapi.api.ItemsApi;
 import com.fb.openapi.model.CreateItemDto;

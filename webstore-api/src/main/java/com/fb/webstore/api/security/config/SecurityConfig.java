@@ -1,4 +1,4 @@
-package com.fb.webstore.api.security;
+package com.fb.webstore.api.security.config;
 
 import com.fb.webstore.api.user.Role;
 import org.springframework.beans.factory.annotation.Value;
@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -39,6 +38,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/auth/register").permitAll()
                         .requestMatchers("/api/auth/login").permitAll()
+                        .requestMatchers("/api/items/categories").permitAll()
                         .requestMatchers("/api/admin/**").hasRole(Role.ADMIN.name())
                         .requestMatchers("/api/user/**", "/customer/**").authenticated()
                         .anyRequest().permitAll()

@@ -44,18 +44,25 @@ const closeModal = () => {
 .modal-content {
   background: white;
   padding: 1rem;
-  border-radius: 8px;
+  border: 4px solid black;
   position: relative;
 }
 
 .modal-close {
   position: absolute;
   top: 10px;
-  right: 10px;
+  right: 20px;
   background: none;
   border: none;
   color: black;
-  font-size: 2rem;
+  font-size: 3rem;
+  padding: 0;
   cursor: pointer;
 }
+
+.modal-close:hover {
+  transform: scale(1.1);
+}
+
+
 </style>

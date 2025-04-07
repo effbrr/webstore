@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/stores/auth.js';
 
 const email = ref('');
 const password = ref('');
@@ -61,14 +61,6 @@ label {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: bold;
-}
-
-input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 1rem;
 }
 
 .register-button {
