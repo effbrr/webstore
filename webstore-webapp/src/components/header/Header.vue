@@ -129,7 +129,9 @@ const onItemAddedToCart = () => {
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  position: relative;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 .nav {
   display: flex;

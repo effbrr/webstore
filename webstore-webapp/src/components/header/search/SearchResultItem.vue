@@ -1,11 +1,18 @@
 <script setup>
 import { defineProps } from 'vue';
 import { resolveImage } from '@/utils/imageResolver';
+import { useCartStore } from '@/stores/cart';
+import cartIcon from '@/assets/cart-buy.svg';
 
 const props = defineProps({
   item: Object
 });
 
+const cartStore = useCartStore();
+const buyNow = () => {
+  cartStore.addItem(props.item);
+  cartStore.openCart();
+};
 </script>
 
 <template>
@@ -20,7 +27,15 @@ const props = defineProps({
         <label class="item-title">{{ item.title }}</label>
         <p class="item-description">{{ item.shortDescription }}</p>
       </div>
-      <p class="item-price">{{ item.price.currentPrice }},-</p>
+      <div class="flex">
+        <p class="item-price">{{ item.price.currentPrice }},-</p>
+        <img
+            :src="cartIcon"
+            alt="Cart"
+            class="icon"
+            @click="buyNow"
+        />
+      </div>
     </div>
   </li>
 </template>
@@ -77,5 +92,18 @@ const props = defineProps({
 .item-price {
   align-content: center;
   font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.icon {
+  width: 30px;
+  height: 30px;
+  margin: auto .2rem;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.icon:hover {
+  transform: scale(1.1);
 }
 </style>

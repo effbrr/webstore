@@ -2,7 +2,6 @@
 import { defineProps, ref } from 'vue';
 import { resolveImage } from '@/utils/imageResolver';
 import { useCartStore } from '@/stores/cart';
-import ItemModal from './ItemModal.vue';
 
 const props = defineProps({
   item: {
@@ -15,26 +14,17 @@ const cartStore = useCartStore();
 
 const buttonText = ref('Add to cart');
 const addedToCart = ref(false);
-const showModal = ref(false);
 
 const buyNow = () => {
   cartStore.addItem(props.item);
   cartStore.openCart();
   addedToCart.value = true;
-  buttonText.value = 'Item added';
+  buttonText.value = 'Added';
 
   setTimeout(() => {
     buttonText.value = 'Add to cart';
     addedToCart.value = false;
   }, 2000); // Change text back after 2 seconds
-};
-
-const openModal = () => {
-  showModal.value = true;
-};
-
-const closeModal = () => {
-  showModal.value = false;
 };
 </script>
 
@@ -55,7 +45,6 @@ const closeModal = () => {
           class="buy-now-btn"
       >{{ buttonText }}</button>
     </div>
-    <ItemModal :itemId="item.id" :show="showModal" :onClose="closeModal" />
   </div>
 </template>
 
@@ -98,6 +87,7 @@ const closeModal = () => {
 
 .item-price {
   font-size: 1rem;
+  font-weight: bold;
 }
 
 .buy-now-btn {

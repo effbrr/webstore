@@ -32,9 +32,9 @@ const removeItem = () => {
       <div class="flex">
         <p class="item-quantity">{{ item.quantity }} x {{ item.price.currentPrice }}</p>
         <p class="item-total-price">{{totalItemPrice(item.quantity, item.price.currentPrice)}},-</p>
+        <button @click="removeItem" class="remove-button" aria-label="Remove item">&times;</button>
       </div>
     </div>
-    <button @click="removeItem" class="remove-button" aria-label="Remove item">X</button>
   </li>
 </template>
 
@@ -104,12 +104,14 @@ const removeItem = () => {
   background: none;
   border: none;
   font-size: 1rem;
-  color: #888;
+  color: black;
   cursor: pointer;
   padding: 0 0.5rem;
+  transform: scale(1.3);
+  margin-left: 5px;
 }
 
 .remove-button:hover {
-  color: #ff0000;
+  transform: scale(1.5);
 }
 </style>

@@ -11,8 +11,7 @@ const items = computed(() => itemsStore.items);
 <template>
   <div class="container">
     <h1>Home</h1>
-    {{items}}
-    <p>Welcome to the Home page!</p>
+
   </div>
 </template>
 

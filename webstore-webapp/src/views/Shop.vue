@@ -34,6 +34,10 @@ const filteredItems = computed(() => {
 
 <template>
   <div class="shop">
+    <div class="title">
+      <h1>Shop {{ categoryTitle ? categoryTitle : 'all' }}</h1>
+    </div>
+
     <div class="item-cards">
       <ItemCard
           v-for="item in filteredItems"
@@ -50,6 +54,10 @@ const filteredItems = computed(() => {
   flex-direction: column;
   align-items: center;
   padding: 2rem;
+}
+
+.title {
+  margin-bottom: 2rem;
 }
 
 .item-cards {
